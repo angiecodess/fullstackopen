@@ -1,8 +1,8 @@
-import React, { useState,useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import Form from './components/Form'
 import Search from './components/Search'
-import Numbers from './components/Numbers'
-import axios from 'axios'
+import Person from './components/Person'
+import personService from './services/persons'
 
 const App = () => {
     const [persons, setPersons] = useState([])
@@ -12,14 +12,10 @@ const App = () => {
 
     useEffect(() => {
         console.log('effect')
-        axios
-          .get('http://localhost:3001/persons')
-          .then(response => {
-            console.log('promise fulfilled')
-            setPersons(response.data)
-          })
-      }, [])
-      console.log('render', persons.length, 'notes')
+        personService
+            .getAll()
+            .then(initialphonebook => setPersons(initialphonebook))
+    }, [])
 
     const handleNameChange = (event) => {
         setNewName(event.target.value)
@@ -39,20 +35,37 @@ const App = () => {
             name: newName,
             number: newNumber
         }
-        const contains = persons.some(person => {
-            return JSON.stringify(nameObj) === JSON.stringify(person)
-        })
-
-        if (!contains) {
-            setPersons(persons.concat(nameObj))
-            setNewName('')
-            setNewNumber('')
-        } else {
-            window.alert(newName + ' is already added to phonebook')
+        const contains = persons.findIndex(person => person.name.toLowerCase() === newName.toLowerCase())
+        if (contains === -1) {
+            personService
+                .create(nameObj)
+                .then(returnedName => {
+                    setPersons(persons.concat(returnedName))
+                    setNewName('')
+                    setNewNumber('')
+                }
+                )
+        } else if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+            const person = persons.find(p => p.name.toLowerCase() === newName.toLocaleLowerCase())
+            const updatedNumber = { ...person, number: newNumber }
+            personService
+                .update(person.id, updatedNumber)
+                .then(returnedPerson => {
+                    setPersons(persons.map(p => p.name.toLowerCase() !== newName.toLowerCase() ? p : returnedPerson))
+                })
         }
     }
 
-    const personstoshow = persons.filter(person => person.name.toLowerCase().includes(search))
+    const deleteNumber = (id, name) => {
+        if (window.confirm(`Delete ${name}?`)) {
+            personService
+                .remove(id)
+            setPersons(persons.filter(p => p.id !== id))
+        }
+    }
+
+
+    const personstoshow = persons.filter(person => person.name.toLowerCase().includes(search.toLowerCase()))
 
 
     return (
@@ -64,7 +77,10 @@ const App = () => {
                 nameHandler={handleNameChange} numberHandler={handleNumberChange}
                 personHandler={addPerson} />
             <h2>Numbers</h2>
-            <Numbers persons={personstoshow} />
+            <ul>
+                {personstoshow.map(person => <Person key={person.name} name={person.name} number={person.number} handler={() => deleteNumber(person.id, person.name)} />
+                )}
+            </ul>
         </div>
     )
 }
