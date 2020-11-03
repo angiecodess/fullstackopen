@@ -27,21 +27,21 @@ let notes = [
     }
 ]
 
-app.get('/api/notes/:id', (request, response) => {
-    const id = Number(request.params.id)
+app.get('/api/notes/:id', (req, res) => {
+    const id = Number(req.params.id)
     const note = notes.find(note => note.id === id)
     if (note) {
-        response.json(note)
+        res.json(note)
     } else {
-        response.status(404).end()
+        res.status(404).end()
     }
 })
 
 
-app.delete('/api/notes/:id', (request, response) => {
-    const id = Number(request.params.id)
+app.delete('/api/notes/:id', (req, res) => {
+    const id = Number(req.params.id)
     notes = notes.filter(note => note.id !== id)
-    response.status(204).end()
+    res.status(204).end()
 })
 
 const generateId = () => {
@@ -51,11 +51,11 @@ const generateId = () => {
     return maxId + 1
 }
 
-app.post('/api/notes', (request, response) => {
-    const body = request.body
+app.post('/api/notes', (req, res) => {
+    const body = req.body
 
     if (!body.content) {
-        return response.status(400).json({
+        return res.status(400).json({
             error: 'content missing'
         })
     }
@@ -69,16 +69,16 @@ app.post('/api/notes', (request, response) => {
 
     notes = notes.concat(note)
 
-    response.json(note)
+    res.json(note)
 })
 
 
-app.get('/', (request, response) => {
-    response.send('<h1>Hello World!</h1>')
+app.get('/', (req, res) => {
+    res.send('<h1>Hello World!</h1>')
 })
 
-app.get('/api/notes', (request, response) => {
-    response.json(notes)
+app.get('/api/notes', (req, res) => {
+    res.json(notes)
 })
 
 
