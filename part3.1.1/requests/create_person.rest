@@ -1,0 +1,7 @@
+POST https://lit-plateau-11831.herokuapp.com/api/persons
+Content-Type: application/json
+
+{
+    "name":"Adam Lev",
+    "number": "098-7654321"
+}
