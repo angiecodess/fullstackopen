@@ -1,1 +1,1 @@
-Phonebook using json-server.
+Notes using json-server.
