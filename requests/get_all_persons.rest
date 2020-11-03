@@ -1,1 +1,1 @@
-GET http://localhost:3001/api/persons
+GET https://lit-plateau-11831.herokuapp.com/api/persons
