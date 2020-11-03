@@ -27,6 +27,12 @@ let notes = [
     }
 ]
 
+
+
+app.get('/api/notes', (req, res) => {
+    res.json(notes)
+})
+
 app.get('/api/notes/:id', (req, res) => {
     const id = Number(req.params.id)
     const note = notes.find(note => note.id === id)
@@ -71,17 +77,6 @@ app.post('/api/notes', (req, res) => {
 
     res.json(note)
 })
-
-
-app.get('/', (req, res) => {
-    res.send('<h1>Hello World!</h1>')
-})
-
-app.get('/api/notes', (req, res) => {
-    res.json(notes)
-})
-
-
 
 
 const PORT = process.env.PORT || 3001
