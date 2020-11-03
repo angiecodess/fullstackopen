@@ -1,0 +1,18 @@
+h1 {
+  color: palevioletred;
+  font-style: italic;
+}
+
+.error {
+  color: red;
+  background: lightgrey;
+  font-size: 20px;
+  border-style: solid;
+  border-radius: 5px;
+}
+
+li {
+  color: teal;
+  font-size: 15px;
+  padding-top: 3px;
+}
