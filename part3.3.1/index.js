@@ -34,23 +34,18 @@ app.delete('/api/persons/:id', (req, res, next) => {
         .catch(err => next(err))
 })
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
     const body = req.body
-
-    if (body.name === undefined) {
-        return res.status(400).json({
-            error: 'content missing'
-        })
-    }
-
     const person = new Person({
         name: body.name,
         number: body.number,
     })
 
-    person.save().then(savedPerson => {
+    person.save()
+    .then(savedPerson => {
         res.json(savedPerson)
     })
+    .catch(err => next(err))
 })
 
 app.put('/api/persons/:id', (req, res, next) => {
@@ -59,7 +54,7 @@ app.put('/api/persons/:id', (req, res, next) => {
         name: body.name,
         number: body.number,
     }
-    Person.findByIdAndUpdate(req.params.id, person, {new:true})
+    Person.findByIdAndUpdate(req.params.id, person, {new:true}, {runValidators: true})
     .then(updatedPerson => {
         res.json(updatedPerson)
     })
@@ -73,9 +68,14 @@ const unknownEndpoint = (req, res) => {
 app.use(unknownEndpoint)
 
 const errorHandler = (err, req, res, next) => {
-    console.error(err.message)
     if (err.name === 'CastError') {
         return res.status(400).send({ error: "malformtted id" })
+    } else if (err.name === 'ValidationError') {
+        console.log("Validation Error");
+        return res.status(400).json({error: err.message})
+    } else if (err.name === "MongoError") {
+        console.log("Mongo Error")
+        return res.status(400).json({error: err.message})
     }
     next(err)
 }
